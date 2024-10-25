@@ -18,15 +18,23 @@ Vagrant.configure("2") do |config|
     web.vm.provision "shell", inline: <<-SCRIPT
 	  sudo apt-get update -y
 	  sudo apt-get upgrade -y
-    sudo apt-get install -y apache2 php libapache2-mod-php mysql-client php-mysql php-mysql php-mysqli php-pdo
+    sudo apt-get install -y apache2 php libapache2-mod-php mysql-client php-mysql php-mysqli php-pdo php-xml
+     
     sudo a2enmod rewrite
 
     sudo bash -c 'echo "<Directory /var/www/html>\n    AllowOverride All\n</Directory>" >> /etc/apache2/sites-available/000-default.conf'
 
-    sudo chown -R www-data:www-data /var/www/html
+    # Installare Composer
+    curl -sS https://getcomposer.org/installer | php
+    sudo mv composer.phar /usr/local/bin/composer
+      
+    # Navigare nella cartella del progetto e installare le dipendenze
+    cd /var/www/html
+    composer update
+    composer install
 
 	  systemctl enable apache2
-	  systemctl start apache2
+	  systemctl restart apache2
 	SCRIPT
   end
 
